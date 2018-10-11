@@ -8,7 +8,7 @@ library(dplyr)
 source("MapFlow_2.R")
 
 #Make projection to the community space
-mappy = mapflow(g, modules)
+flow_cases = mapflow(g_cases, modules)
 
 #export 
-write.graph(mappy, "results/mappy.gml", "gml")
+write.graph(flow_cases, "results/flow_cases.gml", "gml")
