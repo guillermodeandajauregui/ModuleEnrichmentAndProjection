@@ -6,6 +6,11 @@ library(plyr)
 library(data.table)
 library(igraph)
 load("GOs_and_pathways.RData")
+
+#set variables
+pvalue_threshold = 0.05
+
+#cases
 #get list of communities 
 l_comm_cases = communities(modules_cases)
 #in case we are provided with communities already identified for each vertex
@@ -16,8 +21,8 @@ l_comm_cases = communities(modules_cases)
 
 #Enrich
 
-
-enrichment_list_cases = lapply(X = seq_along(l_comm_cases), FUN = function(i){
+enrichment_list_cases = parallel::mclapply(X = seq_along(l_comm_cases), mc.cores = 4, FUN = function(i){
+#enrichment_list_cases = lapply(X = seq_along(l_comm_cases), FUN = function(i){
   
   nomen = names(l_comm)[i]
   
@@ -41,20 +46,22 @@ enrichment_df_cases$Adjusted.Pvalue2 = p.adjust(enrichment_df_cases$Pvalue, meth
 #which(enrichment_df_cases$Adjusted.Pvalue2<0.05)
 
 
-#4) Enrichment projection
-
+#bipartite graph
 b_cases = graph_from_data_frame(enrichment_df_cases, directed = FALSE)
-b_cases = delete.edges(graph = b_cases, edges = E(b_cases)[Adjusted.Pvalue2>0.05])
+b_cases = delete.edges(graph = b_cases, edges = E(b_cases)[Adjusted.Pvalue2>pvalue_threshold])
 
 V(b_cases)$type = TRUE
 V(b_cases)$type[grep(pattern = "GO_", x = V(b_cases)$name)] = FALSE
-V(b_cases)$type
+
+#write out bipartite
+write.graph(b_cases, file = "results/bipartite_cases.gml", "gml")
+
+#4) Enrichment projection
+
+
+
+#projection
 bp_cases = bipartite_projection(graph = b_cases, which = TRUE)
-V(bp_cases)$name
-E(bp_cases)$weight
-components(bp_cases)
-bp_cases
-plot(bp_cases)
 
 write.graph(graph = bp_cases, file = "results/bp_cases.gml", "gml")
 
