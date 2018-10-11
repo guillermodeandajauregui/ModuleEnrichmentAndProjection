@@ -24,11 +24,11 @@ l_comm_cases = communities(modules_cases)
 enrichment_list_cases = parallel::mclapply(X = seq_along(l_comm_cases), mc.cores = 4, FUN = function(i){
 #enrichment_list_cases = lapply(X = seq_along(l_comm_cases), FUN = function(i){
   
-  nomen = names(l_comm)[i]
+  nomen = names(l_comm_cases)[i]
   
   my_enrichment = HTSanalyzeR::multiHyperGeoTest(collectionOfGeneSets = LIST_GO, 
-                                                 universe = V(g)$name, 
-                                                 hits = l_comm[[i]], 
+                                                 universe = V(g_cases)$name, 
+                                                 hits = l_comm_cases[[i]], 
                                                  minGeneSetSize = 1, 
                                                  pAdjustMethod = "BH", 
                                                  verbose = TRUE
@@ -41,8 +41,18 @@ enrichment_list_cases = parallel::mclapply(X = seq_along(l_comm_cases), mc.cores
 })
 
 enrichment_df_cases = ldply(enrichment_list_cases, data.frame)
+
+
 #calculate adjusted pvalue for all communities
 enrichment_df_cases$Adjusted.Pvalue2 = p.adjust(enrichment_df_cases$Pvalue, method = "BH")
+
+write.table(x = enrichment_df_cases, 
+            file = "results/enrichment_df_cases.txt", 
+            row.names = FALSE, 
+            col.names = TRUE, 
+            sep = "\t", 
+            quote = FALSE)
+
 #which(enrichment_df_cases$Adjusted.Pvalue<0.05)
 #which(enrichment_df_cases$Adjusted.Pvalue2<0.05)
 
@@ -87,11 +97,11 @@ l_comm_cntrl = communities(modules_cntrl)
 enrichment_list_cntrl = parallel::mclapply(X = seq_along(l_comm_cntrl), mc.cores = 4, FUN = function(i){
   #enrichment_list_cntrl = lapply(X = seq_along(l_comm_cntrl), FUN = function(i){
   
-  nomen = names(l_comm)[i]
+  nomen = names(l_comm_cntrl)[i]
   
   my_enrichment = HTSanalyzeR::multiHyperGeoTest(collectionOfGeneSets = LIST_GO, 
-                                                 universe = V(g)$name, 
-                                                 hits = l_comm[[i]], 
+                                                 universe = V(g_cntrl)$name, 
+                                                 hits = l_comm_cntrl[[i]], 
                                                  minGeneSetSize = 1, 
                                                  pAdjustMethod = "BH", 
                                                  verbose = TRUE
@@ -104,8 +114,17 @@ enrichment_list_cntrl = parallel::mclapply(X = seq_along(l_comm_cntrl), mc.cores
 })
 
 enrichment_df_cntrl = ldply(enrichment_list_cntrl, data.frame)
+
+
 #calculate adjusted pvalue for all communities
 enrichment_df_cntrl$Adjusted.Pvalue2 = p.adjust(enrichment_df_cntrl$Pvalue, method = "BH")
+
+write.table(x = enrichment_df_cntrl, 
+            file = "results/enrichment_df_cntrl.txt", 
+            row.names = FALSE, 
+            col.names = TRUE, 
+            sep = "\t", 
+            quote = FALSE)
 #which(enrichment_df_cntrl$Adjusted.Pvalue<0.05)
 #which(enrichment_df_cntrl$Adjusted.Pvalue2<0.05)
 
