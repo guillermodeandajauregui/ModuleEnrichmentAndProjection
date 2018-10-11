@@ -1,5 +1,4 @@
 #1) Module detection
 #2) Module flow projection
 #3) Module enrichment and bipartite network
-#4) Enrichment projection
 #5) Network comparison
