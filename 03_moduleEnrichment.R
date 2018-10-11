@@ -41,6 +41,7 @@ enrichment_list_cases = parallel::mclapply(X = seq_along(l_comm_cases), mc.cores
 })
 
 enrichment_df_cases = ldply(enrichment_list_cases, data.frame)
+#calculate adjusted pvalue for all communities
 enrichment_df_cases$Adjusted.Pvalue2 = p.adjust(enrichment_df_cases$Pvalue, method = "BH")
 #which(enrichment_df_cases$Adjusted.Pvalue<0.05)
 #which(enrichment_df_cases$Adjusted.Pvalue2<0.05)
@@ -48,10 +49,17 @@ enrichment_df_cases$Adjusted.Pvalue2 = p.adjust(enrichment_df_cases$Pvalue, meth
 
 #bipartite graph
 b_cases = graph_from_data_frame(enrichment_df_cases, directed = FALSE)
-b_cases = delete.edges(graph = b_cases, edges = E(b_cases)[Adjusted.Pvalue2>pvalue_threshold])
+b_cases = delete.edges(graph = b_cases, 
+                       edges = E(b_cases)[Adjusted.Pvalue2>pvalue_threshold]
+                       )
 
 V(b_cases)$type = TRUE
 V(b_cases)$type[grep(pattern = "GO_", x = V(b_cases)$name)] = FALSE
+
+#add a value that tells us if the comm shows enrichment or not
+#if it has neighbors, it enriches. Else, no
+V(b_cases)$enrich = degree(b_cases)
+V(b_cases)$enrich = ifelse(V(b_cases)$enrich==0, "YES", "NO")
 
 #write out bipartite
 write.graph(b_cases, file = "results/bipartite_cases.gml", "gml")
