@@ -40,3 +40,7 @@ write.table(x = get.data.frame(x = g_cntrl, "vertices"),
             col.names = TRUE, 
             sep = "\t", 
             quote = FALSE)
+
+#write out community structures
+saveRDS(object = modules_cntrl, file = "results/modules_cntrl.RDS")
+saveRDS(object = modules_cases, file = "results/modules_cases.RDS")
