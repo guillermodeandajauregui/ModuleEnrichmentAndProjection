@@ -69,10 +69,13 @@ V(b_cases)$type[grep(pattern = "GO_", x = V(b_cases)$name)] = FALSE
 #add a value that tells us if the comm shows enrichment or not
 #if it has neighbors, it enriches. Else, no
 V(b_cases)$enrich = degree(b_cases)
-V(b_cases)$enrich = ifelse(V(b_cases)$enrich==0, "YES", "NO")
+V(b_cases)$enrich = ifelse(V(b_cases)$enrich==0, "NO", "YES")
 
 #write out bipartite
 write.graph(b_cases, file = "results/bipartite_cases.gml", "gml")
+
+#remove big enrichment list from memory
+rm(enrichment_df_cases)
 
 #4) Enrichment projection
 
@@ -141,11 +144,13 @@ V(b_cntrl)$type[grep(pattern = "GO_", x = V(b_cntrl)$name)] = FALSE
 #add a value that tells us if the comm shows enrichment or not
 #if it has neighbors, it enriches. Else, no
 V(b_cntrl)$enrich = degree(b_cntrl)
-V(b_cntrl)$enrich = ifelse(V(b_cntrl)$enrich==0, "YES", "NO")
+V(b_cntrl)$enrich = ifelse(V(b_cntrl)$enrich==0, "NO", "YES")
 
 #write out bipartite
 write.graph(b_cntrl, file = "results/bipartite_cntrl.gml", "gml")
 
+#remove big enrichment list from memory
+rm(enrichment_df_cntrl)
 #4) Enrichment projection
 
 
